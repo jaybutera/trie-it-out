@@ -30,4 +30,16 @@ impl<K:Eq+Hash+Copy,V> Trie<K,V> {
             self.value = Some(_value);
         }
     }
+
+    pub fn exists<I: Iterator<Item=K>>(&self, mut key_set: I) -> bool {//Option<V> {
+        match key_set.next() {
+            Some(key) => {
+                match self.children.get(&key) {
+                    Some(child) => child.borrow().exists(key_set),
+                    None => false, 
+                }
+            },
+            None => true,//self.value,
+        }
+    }
 }
