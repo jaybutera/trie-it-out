@@ -8,7 +8,7 @@ pub struct Trie<K: Eq+Hash+Copy,V> {
     pub children: HashMap<K, RefCell<Trie<K,V>> >,
 }
 
-impl<K:Eq+Hash+Copy,V> Trie<K,V> {
+impl<K:Eq+Hash+Copy,V:Copy> Trie<K,V> {
     pub fn new() -> Self {
         Trie::<K,V> { value: None, children: HashMap::new() }
     }
@@ -31,15 +31,15 @@ impl<K:Eq+Hash+Copy,V> Trie<K,V> {
         }
     }
 
-    pub fn exists<I: Iterator<Item=K>>(&self, mut key_set: I) -> bool {//Option<V> {
+    pub fn get<I: Iterator<Item=K>>(&self, mut key_set: I) -> Option<V> {
         match key_set.next() {
             Some(key) => {
                 match self.children.get(&key) {
-                    Some(child) => child.borrow().exists(key_set),
-                    None => false, 
+                    Some(child) => child.borrow().get(key_set),
+                    None => None, 
                 }
             },
-            None => true,//self.value,
+            None => self.value,
         }
     }
 }
