@@ -5,7 +5,7 @@ use std::cell::RefCell;
 
 pub struct Trie<K: Eq+Hash+Copy,V> {
     pub value: Option<V>,
-    pub children: HashMap<K, RefCell<Trie<K,V>> >,
+    pub children: HashMap<K, Box<Trie<K,V>> >,
 }
 
 impl<K:Eq+Hash+Copy,V:Copy> Trie<K,V> {
@@ -16,14 +16,14 @@ impl<K:Eq+Hash+Copy,V:Copy> Trie<K,V> {
     pub fn add<I: Iterator<Item=K>>(&mut self, mut key_set: I, _value: V)
     {
         if let Some(key) = key_set.next() {
-            if let Some(child) = self.children.get(&key) {
-                child.borrow_mut().add(key_set, _value);
+            if let Some(mut child) = self.children.remove(&key) {
+                child.add(key_set, _value);
+                self.children.insert(key, child);
             }
             else {
-                self.children.insert(key, RefCell::new(Trie::<K,V>::new()));
-                let child = self.children.get(&key).unwrap();
-
-                child.borrow_mut().add(key_set, _value);
+                let mut child = Box::new(Trie::<K,V>::new());
+                child.add(key_set, _value);
+                self.children.insert(key, child);
             }
         }
         else {
@@ -35,7 +35,7 @@ impl<K:Eq+Hash+Copy,V:Copy> Trie<K,V> {
         match key_set.next() {
             Some(key) => {
                 match self.children.get(&key) {
-                    Some(child) => child.borrow().get(key_set),
+                    Some(child) => child.get(key_set),
                     None => None, 
                 }
             },
