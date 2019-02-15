@@ -2,14 +2,25 @@ mod trie;
 
 use trie::{Trie};
 
+fn byte_string(x: i32) -> String {
+    let mut v = x;
+    let mut bytes = String::from("");
+    let mut i = 0;
+
+    while v >= 1 {
+        bytes.push(if v % 2 == 1 {'1'} else {'0'});
+        v = v / 2;
+        i += 1;
+    }
+
+    bytes
+}
+
 fn main() {
     let mut t = Trie::<char,i32>::new();
-    t.add("amy".chars(), 24);
-    match t.get("amy".chars()) {
-        Some(_) => println!("found!"),
-        None => println!("not there"),
-    }
-    //t.add("ann".chars(), 30);
 
-    //assert_eq!(t.get("amy"), Some(24));
+    for i in 0..100000 {
+        t.add(byte_string(i).chars(), 24);
+    }
+    //assert_eq!(t.get("amy".chars()), Some(24));
 }
