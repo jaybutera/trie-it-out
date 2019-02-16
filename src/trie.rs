@@ -16,9 +16,8 @@ impl<K:Eq+Hash,V:Copy> Trie<K,V> {
     pub fn add<I: Iterator<Item=K>>(&mut self, mut key_set: I, _value: V)
     {
         if let Some(key) = key_set.next() {
-            if let Some(mut child) = self.children.get_mut(&key) {//self.children.remove(&key) {
+            if let Some(mut child) = self.children.get_mut(&key) {
                 child.add(key_set, _value);
-                //self.children.insert(key, child);
             }
             else {
                 let mut child = Box::new(Trie::<K,V>::new());
